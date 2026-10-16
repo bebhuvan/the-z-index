@@ -1,0 +1,126 @@
+---
+import Base from '../layouts/Base.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { items, activeInitiatives, url } from '../lib/data.js';
+---
+<Base title="Search" description={`Search the full text of ${items.length.toLocaleString('en-IN')} Zerodha newsletters and videos.`}>
+  <div class="wrap with-side">
+    <main id="main">
+      <header class="head">
+        <h1>Search</h1>
+        <p class="dek">The full text of {items.length.toLocaleString('en-IN')} pieces, back to {items.at(-1)?.date.slice(0, 4)}.</p>
+      </header>
+
+      <form class="field big" role="search" id="search-form">
+        <label class="visually-hidden" for="q">Search</label>
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.75" /><path d="M10.5 10.5 14 14" /></svg>
+        <input id="q" name="q" type="search" placeholder="Try “anti-dumping”, “Zetwerk” or “monsoon”" autocomplete="off" autofocus />
+      </form>
+
+      <div class="search-filters">
+        <div class="legend" role="group" aria-label="Publication">
+          <button class="tab" type="button" data-p="" aria-pressed="true">Everything</button>
+          {activeInitiatives.map((ini) => (
+            <button class="tab" type="button" data-p={ini.name} aria-pressed="false" style={`--dot: var(--c-${ini.id})`}><span class="swatch" aria-hidden="true"></span>{ini.short ?? ini.name}</button>
+          ))}
+        </div>
+        <div class="filter-row">
+          <div class="formats" role="group" aria-label="Format">
+            <button class="tab" type="button" data-f="" aria-pressed="true">All</button>
+            <button class="tab" type="button" data-f="Newsletter" aria-pressed="false">Read</button>
+            <button class="tab" type="button" data-f="Video" aria-pressed="false">Watch</button>
+          </div>
+          <div class="formats" role="group" aria-label="Order">
+            <button class="tab" type="button" data-s="" aria-pressed="true">Best match</button>
+            <button class="tab" type="button" data-s="date" aria-pressed="false">Newest</button>
+          </div>
+          <span class="count" id="s-count" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <ol class="results" id="results"></ol>
+      <p class="more" id="s-more" hidden><button type="button" class="link-btn" id="s-more-btn">Show more results</button></p>
+      <p class="empty" id="s-empty" hidden></p>
+    </main>
+    <Sidebar />
+  </div>
+
+  <script is:inline define:vars={{ pagefindUrl: url('pagefind/pagefind.js'), colors: Object.fromEntries(activeInitiatives.map((i) => [i.id, `var(--c-${i.id})`])) }}>
+    const $ = (id) => document.getElementById(id);
+    const q = $('q'), list = $('results'), count = $('s-count'), more = $('s-more'), empty = $('s-empty');
+    const params = new URLSearchParams(location.search);
+    const state = { q: params.get('q') || '', p: params.get('p') || '', f: params.get('f') || '', s: params.get('s') || '' };
+    q.value = state.q;
+    let pf, results = [], shown = 0, seq = 0;
+
+    // Day and month on one line, the year under it, so dates fit the same time column as the feed.
+    const MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
+    const fmtDate = (iso) => {
+      const [y, m, d] = new Date(iso).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }).split('-');
+      return `${+d} ${MON[m - 1]}<br>${y}`;
+    };
+    const ICON = {
+      read: '<svg class="ficon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Newsletter" role="img"><path d="M4 1.75h5.5L12.5 4.75v9.5H4z"/><path d="M9.25 1.75v3.25h3.25M6 8h4.5M6 10.5h4.5"/></svg>',
+      video: '<svg class="ficon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Video" role="img"><rect x="1.75" y="3.25" width="12.5" height="9.5" rx="2"/><path d="M6.75 6.1v3.8L9.9 8z" fill="currentColor" stroke-width="1"/></svg>',
+      audio: '<svg class="ficon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-label="Podcast" role="img"><path d="M2.5 7v2M5 5v6M7.5 3v10M10 5.5v5M12.5 7v2"/></svg>',
+    };
+    const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+    function sync() {
+      document.querySelectorAll('[data-p]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.p === state.p)));
+      document.querySelectorAll('[data-f]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.f === state.f)));
+      document.querySelectorAll('[data-s]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.s === state.s)));
+      document.querySelector('.search-filters .legend').classList.toggle('has-active', !!state.p);
+      const u = new URLSearchParams(Object.entries(state).filter(([, v]) => v));
+      history.replaceState(null, '', u.size ? `?${u}` : location.pathname);
+    }
+
+    async function render(n) {
+      const slice = await Promise.all(results.slice(shown, shown + n).map((r) => r.data()));
+      for (const d of slice) {
+        const m = d.meta;
+        const li = document.createElement('li');
+        li.className = 'item';
+        li.innerHTML = `<div class="when"><time class="time" datetime="${m.date}">${fmtDate(m.date)}</time><span class="formats-ic">${ICON[m.format] ?? ''}</span></div>
+          <div><h4><a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(m.title)}</a></h4>
+          <p class="excerpt">${d.excerpt}</p>
+          <div class="meta" style="--dot:${colors[m.initiative] ?? 'var(--muted)'}"><span class="src"><span class="swatch" aria-hidden="true"></span>${esc(m.source)}</span>${m.section ? `<span>${esc(m.section)}</span>` : ''}</div></div>`;
+        list.appendChild(li);
+      }
+      shown += slice.length;
+      more.hidden = shown >= results.length;
+    }
+
+    async function run() {
+      sync();
+      const my = ++seq;
+      list.innerHTML = ''; shown = 0; more.hidden = true; empty.hidden = true;
+      if (!state.q.trim()) { count.textContent = ''; return; }
+      if (!pf) {
+        try { pf = await import(pagefindUrl); await pf.options({ excerptLength: 28 }); }
+        catch { empty.textContent = 'The search index is built with the site. Run npm run build, then npm run preview.'; empty.hidden = false; return; }
+      }
+      const filters = {};
+      if (state.p) filters.publication = state.p;
+      filters.format = state.f ? state.f : { not: 'Short' };
+      const res = await pf.debouncedSearch(state.q, { filters, sort: state.s ? { date: 'desc' } : undefined }, 200);
+      if (res === null || my !== seq) return; // superseded by a newer keystroke
+      results = res.results;
+      count.textContent = results.length === 1 ? '1 result' : `${results.length.toLocaleString('en-IN')} results`;
+      if (!results.length) { empty.textContent = `No results for “${state.q}”. Try a shorter or broader word, or set the filters back to Everything and All.`; empty.hidden = false; return; }
+      await render(20);
+    }
+
+    q.addEventListener('input', () => { state.q = q.value; run(); });
+    $('search-form').addEventListener('submit', (e) => { e.preventDefault(); state.q = q.value; run(); });
+    document.querySelector('.search-filters').addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if ('p' in b.dataset) state.p = b.dataset.p;
+      if ('f' in b.dataset) state.f = b.dataset.f;
+      if ('s' in b.dataset) state.s = b.dataset.s;
+      run();
+    });
+    $('s-more-btn').addEventListener('click', () => render(20));
+    run();
+  </script>
+</Base>

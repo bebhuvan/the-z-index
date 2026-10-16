@@ -1,0 +1,12 @@
+---
+// One day on the 24-hour publishing tape: one tick per piece, placed at the time it went out (IST),
+// coloured by initiative. WeekTape stacks seven of these.
+import { istMinutes } from '../lib/data.js';
+
+const { items } = Astro.props;
+const ticks = items.map((it) => ({ left: ((istMinutes(it.date) / 1440) * 100).toFixed(2), ini: it.initiative }));
+---
+<div class="tape">
+  {[6, 12, 18].map((h) => <span class="hour" style={`left:${(h / 24) * 100}%`}></span>)}
+  {ticks.map((t) => <i style={`left:${t.left}%;--dot:var(--c-${t.ini})`}></i>)}
+</div>

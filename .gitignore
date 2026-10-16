@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+.dev.vars
+
+# Internal working notes, not for the public repo
+docs/design-brief.md

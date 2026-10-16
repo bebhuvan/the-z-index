@@ -1,0 +1,34 @@
+---
+// The last seven days on the 24-hour tape: one row per day, one tick per piece at the time it
+// went out (IST), coloured by initiative. Shows the publishing rhythm at a glance.
+import Tape from './Tape.astro';
+import { dayKey } from '../lib/data.js';
+
+const { items } = Astro.props;
+const pieces = items.filter((i) => !i.short);
+const DAY = 86400e3;
+const fmt = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric' });
+const newest = Date.parse(pieces[0]?.date ?? new Date().toISOString());
+const days = Array.from({ length: 7 }, (_, n) => {
+  const t = new Date(newest - n * DAY).toISOString();
+  const key = dayKey(t);
+  const list = pieces.filter((i) => dayKey(i.date) === key);
+  return { key, label: fmt.format(new Date(t)), list };
+});
+const HOURS = [0, 6, 12, 18, 24];
+const hourLabel = (h) => (h === 0 || h === 24 ? '12am' : h === 12 ? 'noon' : h < 12 ? `${h}am` : `${h - 12}pm`);
+---
+<div class="week" role="img" aria-label="Pieces published in the last seven days, by time of day">
+  {days.map((d) => (
+    <div class="week-row">
+      <span class="week-day">{d.label}</span>
+      <Tape items={d.list} />
+      <span class="week-n">{d.list.length}</span>
+    </div>
+  ))}
+  <div class="week-row" aria-hidden="true">
+    <span></span>
+    <div class="axis">{HOURS.map((h) => <span style={`left:${(h / 24) * 100}%`}>{hourLabel(h)}</span>)}</div>
+    <span></span>
+  </div>
+</div>

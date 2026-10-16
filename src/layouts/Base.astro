@@ -1,0 +1,102 @@
+---
+import '../styles/global.css';
+import { url, status, SITE_NAME, SITE_DESCRIPTION, DISCLAIMER } from '../lib/data.js';
+
+interface Props {
+  title?: string;
+  description?: string;
+  jsonld?: object | object[];
+  feeds?: { title: string; href: string }[];
+}
+
+const { title, description = SITE_DESCRIPTION, jsonld = [], feeds = [] } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME}: every Zerodha newsletter and video, newest first`;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL(url('og.png'), Astro.site).toString();
+const updated = new Intl.DateTimeFormat('en-IN', {
+  timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true,
+}).format(new Date(status.generated));
+
+const fontFaces = `@font-face{font-family:'Schibsted Grotesk';src:url('${url('fonts/schibsted-grotesk.woff2')}') format('woff2');font-weight:400 800;font-style:normal;font-display:swap}`;
+const here = Astro.url.pathname;
+const current = (p) => (here.startsWith(url(p)) ? 'page' : null);
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': new URL(url(''), Astro.site) + '#website', name: SITE_NAME, url: new URL(url(''), Astro.site).toString(), description: SITE_DESCRIPTION, inLanguage: 'en-IN' },
+    ...[jsonld].flat(),
+  ],
+};
+---
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <link rel="preload" href={url('fonts/schibsted-grotesk.woff2')} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fontFaces}></style>
+    <link rel="preconnect" href="https://substackcdn.com" crossorigin />
+    <link rel="preconnect" href="https://i.ytimg.com" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title ?? SITE_NAME} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1621" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={url('sitemap.xml')} />
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href={url('feed.xml')} />
+    {feeds.map((f) => <link rel="alternate" type="application/rss+xml" title={f.title} href={f.href} />)}
+    <link rel="alternate" type="text/plain" title="llms.txt" href={url('llms.txt')} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(graph)} />
+    <script is:inline>
+      try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="topbar">
+      <div class="wrap">
+        <a class="brand" href={url('')}>The Z Index <span>Unofficial</span></a>
+        <nav aria-label="Primary">
+          <a class="tab" href={url('search/')} aria-current={current('search/')}>Search</a>
+          <a class="tab" href={url('publications/')} aria-current={current('publications/')}>Publications</a>
+          <a class="tab" href={url('archive/')} aria-current={current('archive/')}>Archive</a>
+          <a class="tab nav-rss" href={url('feed.xml')}>RSS</a>
+        </nav>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="foot">
+      <div class="wrap">
+        <p>{DISCLAIMER} Updated <time datetime={status.generated}>{updated} IST</time>.</p>
+        <button class="theme-btn" type="button" id="theme-btn">Switch theme</button>
+      </div>
+    </footer>
+    <script is:inline>
+      document.getElementById('theme-btn').addEventListener('click', () => {
+        const root = document.documentElement;
+        const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        root.dataset.theme = dark ? 'light' : 'dark';
+        try { localStorage.setItem('theme', root.dataset.theme); } catch {}
+      });
+    </script>
+  </body>
+</html>

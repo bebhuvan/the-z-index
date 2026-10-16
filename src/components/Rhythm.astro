@@ -1,0 +1,27 @@
+---
+// Time-of-day histogram: pieces per half hour (IST). Used on initiative pages, where a tick strip
+// would overplot.
+import { istMinutes } from '../lib/data.js';
+
+const { items, color } = Astro.props;
+const bins = Array(48).fill(0);
+for (const it of items) bins[Math.floor(istMinutes(it.date) / 30)]++;
+const max = Math.max(1, ...bins);
+const peak = bins.indexOf(max);
+const fmt = (slot) => {
+  const h = Math.floor(slot / 2), m = slot % 2 ? '30' : '00';
+  return `${h % 12 === 0 ? 12 : h % 12}:${m}${h < 12 ? 'am' : 'pm'}`;
+};
+const HOURS = [0, 6, 12, 18, 24];
+const hourLabel = (h) => (h === 0 || h === 24 ? '12am' : h === 12 ? 'noon' : h < 12 ? `${h}am` : `${h - 12}pm`);
+---
+<div class="rhythm" role="img" aria-label={`Pieces by time of day; busiest half hour starts at ${fmt(peak)} IST`} style={`--dot: var(--c-${color})`}>
+  {[6, 12, 18].map((h) => <span class="hour" style={`left:${(h / 24) * 100}%`}></span>)}
+  {bins.map((n, i) => n > 0 && (
+    <i style={`left:${(i / 48) * 100}%;height:${Math.max(4, (n / max) * 100)}%`} title={`${fmt(i)}: ${n}`}></i>
+  ))}
+</div>
+<div class="axis" aria-hidden="true">
+  {HOURS.map((h) => <span style={`left:${(h / 24) * 100}%`}>{hourLabel(h)}</span>)}
+</div>
+<p class="rhythm-note">Busiest half hour: {fmt(peak)} IST.</p>

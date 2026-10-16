@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { initiatives, itemsFor, TYPE_LABEL, url, oneLine, initiativeLd, abs } from '../../lib/data.js';
+
+const site = Astro.site;
+const rows = initiatives.map((ini) => ({ ...ini, count: itemsFor(ini.id).length }));
+const channels = initiatives.reduce((n, i) => n + i.properties.length, 0);
+const jsonld = {
+  '@type': 'CollectionPage',
+  name: 'Publications',
+  url: abs(site, 'publications/'),
+  hasPart: initiatives.map((ini) => initiativeLd(ini, site)),
+};
+---
+<Base
+  title="Publications"
+  description="Every Zerodha newsletter, YouTube channel and blog, by initiative: Markets by Zerodha, Subtext, In The Money, Varsity, Zero1, Rainmatter Foundation and Zerodha."
+  jsonld={jsonld}
+>
+  <div class="wrap with-side">
+  <main id="main">
+    <header class="head">
+      <h1>Publications</h1>
+      <p class="dek">{initiatives.length} initiatives and the {channels} newsletters, channels and sites they run.</p>
+    </header>
+    {rows.map((ini) => (
+      <section class="pub" style={`--dot: var(--c-${ini.id})`} aria-labelledby={`h-${ini.id}`}>
+        <div class="pub-title">
+          <h2 id={`h-${ini.id}`}><a href={url(`publications/${ini.id}/`)}><span class="swatch" aria-hidden="true"></span>{ini.name}</a></h2>
+          {ini.count > 0 && <span class="muted">{ini.count.toLocaleString('en-IN')} pieces</span>}
+        </div>
+        <p class="pub-about">{oneLine(ini.about)}</p>
+        <ul class="channels">
+          {ini.properties.filter((p) => p.url?.startsWith('http')).map((p) => (
+            <li class={p.status === 'dormant' ? 'paused' : null}>
+              <a href={p.url} target="_blank" rel="noopener">{p.name}</a>
+              <span class="about">{p.about}</span>
+              <span class="type">{p.status === 'dormant' ? 'Paused' : TYPE_LABEL[p.type] ?? p.type}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </main>
+    <Sidebar />
+  </div>
+</Base>

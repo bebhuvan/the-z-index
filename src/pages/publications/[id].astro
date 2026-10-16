@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import Stream from '../../components/Stream.astro';
+import Rhythm from '../../components/Rhythm.astro';
+import { initiatives, itemsFor, displayItems, TYPE_LABEL, url, oneLine, initiativeLd, itemListLd, abs } from '../../lib/data.js';
+
+export const getStaticPaths = () => initiatives.map((ini) => ({ params: { id: ini.id }, props: { ini } }));
+
+const { ini } = Astro.props;
+const site = Astro.site;
+const all = itemsFor(ini.id);
+// Latest 60 days, but never fewer than 30 pieces when the initiative has them.
+const cutoff = Date.now() - 60 * 86400e3;
+const recent = all.filter((i, n) => n < 30 || Date.parse(i.date) >= cutoff);
+const recentIds = new Set(recent.map((i) => i.id));
+const recentDisplay = displayItems.filter((i) => recentIds.has(i.id));
+const rhythm = all.filter((i) => !i.short && Date.parse(i.date) >= Date.now() - 90 * 86400e3);
+const years = [...new Set(all.map((i) => i.date.slice(0, 4)))].sort().reverse();
+const props = ini.properties.filter((p) => p.url?.startsWith('http'));
+const about = oneLine(ini.about);
+const feedHref = url(`feeds/${ini.id}.xml`);
+
+const jsonld = [
+  initiativeLd(ini, site),
+  {
+    '@type': 'CollectionPage',
+    name: `${ini.name}: latest newsletters and videos`,
+    url: abs(site, `publications/${ini.id}/`),
+    about: { '@id': abs(site, `publications/${ini.id}/`) + '#org' },
+    mainEntity: itemListLd(recent.filter((i) => !i.short).slice(0, 30)),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: abs(site, '') },
+      { '@type': 'ListItem', position: 2, name: 'Publications', item: abs(site, 'publications/') },
+      { '@type': 'ListItem', position: 3, name: ini.name, item: abs(site, `publications/${ini.id}/`) },
+    ],
+  },
+];
+---
+<Base
+  title={ini.name}
+  description={about.length > 155 ? about.slice(0, about.lastIndexOf(' ', 152)) + '…' : about}
+  jsonld={jsonld}
+  feeds={all.length ? [{ title: `${ini.name} · The Z Index`, href: feedHref }] : []}
+>
+  <div class="wrap with-side" style={`--dot: var(--c-${ini.id})`}>
+  <main id="main">
+    <header class="head">
+      <a class="crumb" href={url('publications/')}>Publications</a>
+      <h1>{ini.name}</h1>
+      <p class="dek">{about}</p>
+      {all.length > 0 && (
+        <div class="actions">
+          <a class="link" href={feedHref}>Follow with RSS</a>
+          <a class="link" href={url(`archive/${years[0]}/?i=${ini.id}`)}>Archive</a>
+        </div>
+      )}
+    </header>
+    {rhythm.length > 2 && (
+      <section class="section" aria-labelledby="rhythm-h">
+        <div class="section-head">
+          <h2 id="rhythm-h">When it publishes</h2>
+          <span class="muted">{rhythm.length} pieces in the last 90 days</span>
+        </div>
+        <Rhythm items={rhythm} color={ini.id} />
+      </section>
+    )}
+
+    <section class="section" id="where" aria-labelledby="where-h">
+      <div class="section-head"><h2 id="where-h">Where to find it</h2></div>
+      <ul class="channels">
+        {props.map((p) => (
+          <li class={p.status === 'dormant' ? 'paused' : null}>
+            <a href={p.url} target="_blank" rel="noopener">{p.name}</a>
+            <span class="about">{p.about}{p.sections?.length > 0 && <> Series: {p.sections.map((s) => s.name).join(', ')}.</>}</span>
+            <span class="type">{p.status === 'dormant' ? 'Paused' : TYPE_LABEL[p.type] ?? p.type}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+    <section class="section" aria-labelledby="latest-h">
+      <div class="section-head"><h2 id="latest-h">Latest</h2></div>
+      {recentDisplay.length ? <Stream items={recentDisplay} chips={false} /> : <p class="empty">Nothing collected here yet. The channels above link to everything it has published.</p>}
+    </section>
+  </main>
+    <Sidebar />
+  </div>
+</Base>

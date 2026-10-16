@@ -1,0 +1,9 @@
+name = "zerodha-feed-proxy"
+main = "index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Hosts the proxy may fetch (suffix match). Add a domain here when sources.yaml gains a new host.
+ALLOWED_SUFFIXES = "substack.com,zerodha.com,youtube.com"
+
+# Secret, set once with:  npx wrangler secret put PROXY_KEY

@@ -1,0 +1,44 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { items, initiatives, url } from '../../lib/data.js';
+
+const years = [...new Set(items.map((i) => i.date.slice(0, 4)))].sort().reverse();
+const rows = years.map((y) => {
+  const inYear = items.filter((i) => i.date.startsWith(y));
+  const mix = initiatives
+    .map((ini) => ({ id: ini.id, name: ini.short ?? ini.name, n: inYear.filter((i) => i.initiative === ini.id).length }))
+    .filter((c) => c.n);
+  return { y, n: inYear.length, mix };
+});
+---
+<Base title="Archive" description={`All ${items.length.toLocaleString('en-IN')} newsletters and videos from Zerodha's publications, by year, going back to ${years.at(-1)}.`}>
+  <div class="wrap with-side">
+  <main id="main">
+    <header class="head">
+      <h1>Archive</h1>
+      <p class="dek">
+        {items.length.toLocaleString('en-IN')} pieces, back to {years.at(-1)}. Newsletters are here in full; videos
+        from the day this site began tracking them.
+      </p>
+    </header>
+    <ol class="years">
+      {rows.map((r) => (
+        <li>
+          <a href={url(`archive/${r.y}/`)}><span class="yr">{r.y}</span></a>
+          <span class="yn">{r.n.toLocaleString('en-IN')} pieces</span>
+          <div class="mixcell">
+            <div class="mix" role="img" aria-label={r.mix.map((c) => `${c.name} ${c.n}`).join(', ')}>
+              {r.mix.map((c) => <i style={`width:${(c.n / r.n) * 100}%;--dot:var(--c-${c.id})`}></i>)}
+            </div>
+            <div class="mix-key">
+              {r.mix.map((c) => <span style={`--dot:var(--c-${c.id})`}><span class="swatch" aria-hidden="true"></span>{c.name} {c.n}</span>)}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </main>
+    <Sidebar />
+  </div>
+</Base>

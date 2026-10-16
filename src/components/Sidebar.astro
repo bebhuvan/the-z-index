@@ -1,0 +1,42 @@
+---
+// Sticky sidebar: search, the publications with their count for the last seven days, and feeds.
+import { initiatives, items, url } from '../lib/data.js';
+
+const weekAgo = Date.parse(items[0]?.date ?? new Date().toISOString()) - 7 * 86400e3;
+const rows = initiatives.map((ini) => ({
+  ...ini,
+  week: items.filter((i) => i.initiative === ini.id && !i.short && Date.parse(i.date) >= weekAgo).length,
+}));
+const total = items.length.toLocaleString('en-IN');
+---
+<aside class="side" aria-label="Search and publications">
+  <form class="field side-search" action={url('search/')} method="get" role="search">
+    <label class="visually-hidden" for="side-q">Search</label>
+    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.75" /><path d="M10.5 10.5 14 14" /></svg>
+    <input id="side-q" name="q" type="search" placeholder={`Search ${total} pieces`} autocomplete="off" />
+  </form>
+
+  <section class="side-block" aria-labelledby="side-pubs">
+    <div class="side-head"><h2 id="side-pubs">Publications</h2><span>Last 7 days</span></div>
+    <ul class="side-list">
+      {rows.map((ini) => (
+        <li style={`--dot: var(--c-${ini.id})`}>
+          <a href={url(`publications/${ini.id}/`)}>
+            <span class="swatch" aria-hidden="true"></span>
+            <span class="side-name">{ini.name}</span>
+            <span class="side-n">{ini.week}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <a class="side-more" href={url('publications/')}>All newsletters and channels</a>
+  </section>
+
+  <section class="side-block" aria-labelledby="side-sub">
+    <div class="side-head"><h2 id="side-sub">Follow</h2></div>
+    <ul class="side-links">
+      <li><a href={url('feed.xml')}>RSS feed of everything</a></li>
+      <li><a href={url('opml.xml')}>OPML file for feed readers</a></li>
+    </ul>
+  </section>
+</aside>

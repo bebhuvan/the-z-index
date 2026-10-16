@@ -1,0 +1,152 @@
+{
+ "generated": "2026-10-15T09:45:59.266Z",
+ "sources": [
+  {
+   "name": "The Daily Brief",
+   "ok": true,
+   "fetched": 20,
+   "added": 0,
+   "ms": 794
+  },
+  {
+   "name": "The Chatter",
+   "ok": true,
+   "fetched": 20,
+   "added": 0,
+   "ms": 548
+  },
+  {
+   "name": "Aftermarket Report",
+   "ok": true,
+   "fetched": 20,
+   "added": 0,
+   "ms": 256
+  },
+  {
+   "name": "What the hell is happening?",
+   "ok": true,
+   "fetched": 9,
+   "added": 0,
+   "ms": 995
+  },
+  {
+   "name": "Markets by Zerodha",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 916
+  },
+  {
+   "name": "Markets by Zerodha Hindi",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 238
+  },
+  {
+   "name": "Markets by Zerodha Kannada",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 231
+  },
+  {
+   "name": "Subtext by Zerodha",
+   "ok": true,
+   "fetched": 20,
+   "added": 0,
+   "ms": 1871
+  },
+  {
+   "name": "Zerodha Subtext",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 679
+  },
+  {
+   "name": "In The Money by Zerodha",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 38
+  },
+  {
+   "name": "Mind Over Markets",
+   "ok": true,
+   "fetched": 20,
+   "added": 0,
+   "ms": 592
+  },
+  {
+   "name": "Zerodha Varsity",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 186
+  },
+  {
+   "name": "Zerodha Varsity Hindi",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 241
+  },
+  {
+   "name": "Zero1 by Zerodha",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 35
+  },
+  {
+   "name": "Zero1 Hindi",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 190
+  },
+  {
+   "name": "Zero1 Hustle",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 194
+  },
+  {
+   "name": "The Climate Brief",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 197
+  },
+  {
+   "name": "Climate Brief by Rainmatter",
+   "ok": true,
+   "fetched": 10,
+   "added": 0,
+   "ms": 980
+  },
+  {
+   "name": "Rainmatter Foundation by Zerodha",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 239
+  },
+  {
+   "name": "Zerodha",
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 34
+  },
+  {
+   "name": "Z-Connect",
+   "ok": true,
+   "fetched": 50,
+   "added": 0,
+   "ms": 480
+  }
+ ]
+}

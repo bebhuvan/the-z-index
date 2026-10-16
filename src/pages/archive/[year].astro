@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import Stream from '../../components/Stream.astro';
+import { items, displayItems, url, abs, itemListLd } from '../../lib/data.js';
+
+export function getStaticPaths() {
+  const years = [...new Set(items.map((i) => i.date.slice(0, 4)))].sort().reverse();
+  return years.map((year, i) => ({
+    params: { year },
+    props: { newer: years[i - 1], older: years[i + 1] },
+  }));
+}
+
+const { year } = Astro.params;
+const { newer, older } = Astro.props;
+const list = items.filter((i) => i.date.startsWith(year));
+const sources = [...new Set(list.map((i) => i.source))];
+const jsonld = {
+  '@type': 'CollectionPage',
+  name: `Zerodha publications in ${year}`,
+  url: abs(Astro.site, `archive/${year}/`),
+  mainEntity: itemListLd(list.filter((i) => !i.short).slice(0, 50)),
+};
+---
+<Base title={`${year} archive`} description={`${list.length.toLocaleString('en-IN')} pieces Zerodha published in ${year}, from ${sources.slice(0, 4).join(', ')}${sources.length > 4 ? ' and more' : ''}.`} jsonld={jsonld}>
+  <div class="wrap with-side">
+  <main id="main">
+    <header class="head">
+      <a class="crumb" href={url('archive/')}>Archive</a>
+      <h1>{year}</h1>
+      <p class="dek">{list.length.toLocaleString('en-IN')} pieces, by month.</p>
+      <div class="actions">
+        {newer && <a class="link" href={url(`archive/${newer}/`)}>Newer: {newer}</a>}
+        {older && <a class="link" href={url(`archive/${older}/`)}>Older: {older}</a>}
+      </div>
+    </header>
+    <h2 class="visually-hidden">Every piece from {year}, by month</h2>
+    <Stream items={displayItems.filter((i) => i.date.startsWith(year))} by="month" compact />
+  </main>
+    <Sidebar />
+  </div>
+</Base>

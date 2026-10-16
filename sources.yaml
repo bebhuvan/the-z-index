@@ -1,0 +1,226 @@
+# Inventory of Zerodha content properties.
+# Verified 2026-10-15 by fetching each feed / channel page directly.
+# This file becomes the site's source config: initiatives -> properties -> feeds.
+# status: active (published in last ~30 days) | dormant | unverified
+# about: plain factual description, drawn from each publication's own copy. Shown on the
+#        initiative pages and in llms.txt, so keep it accurate and free of marketing.
+
+initiatives:
+  - id: markets
+    name: Markets by Zerodha
+    short: Markets        # label in the colour key
+    blurb: Daily explainers on the biggest stories in Indian markets and the global economy.
+    about: >-
+      Markets by Zerodha explains what is happening in markets, business and the economy in plain
+      English. Its flagship is The Daily Brief, a daily newsletter, podcast and YouTube show on the
+      biggest stories in Indian and global markets, also published in Hindi. The same team writes
+      The Chatter, on what India's biggest companies are saying, and the Aftermarket Report, a short
+      daily wrap of the markets.
+    properties:
+      - name: The Daily Brief
+        type: newsletter
+        url: https://thedailybrief.zerodha.com
+        about: The biggest stories in Indian markets and the global business landscape, every weekday.
+        feed: https://thedailybrief.zerodha.com/feed
+        status: active   # latest post 15 Oct 2026
+        sections:        # Substack sections; posts carry these as tags
+          - { name: "Beyond the Charts", slug: beyond-the-charts }
+          - { name: "Who Said What?", slug: who-said-what }
+          - { name: "The World, Simplified", slug: the-world-simplified }
+          - { name: "What Does That Mean?", slug: what-does-that-mean }
+          - { name: "Investing in India", slug: investing-in-india }
+          - { name: "Inside Markets by Zerodha", slug: inside-markets-by-zerodha }
+      - name: The Chatter
+        type: newsletter
+        url: https://thechatter.zerodha.com
+        about: What India's biggest companies are saying, from earnings calls and beyond.
+        feed: https://thechatter.zerodha.com/feed
+        status: active   # latest 14 Oct 2026
+        sections:
+          - { name: "Plotlines", slug: plotlines }
+          - { name: "Points & Figures", slug: points-and-figures }
+      - name: Aftermarket Report
+        type: newsletter
+        url: https://aftermarketreport.zerodha.com
+        about: A quick daily rundown of what happened in the Indian markets.
+        feed: https://aftermarketreport.zerodha.com/feed
+        status: active   # latest 14 Oct 2026
+      - name: What the hell is happening?
+        type: newsletter
+        url: https://whatthehellishappening.substack.com
+        about: Curated reading for making sense of fast-moving world events.
+        feed: https://whatthehellishappening.substack.com/feed
+        status: dormant  # latest 1 Nov 2025
+      - name: Markets by Zerodha
+        type: youtube
+        url: https://www.youtube.com/@marketsbyzerodha
+        about: The Daily Brief and other shows on markets, business and the economy.
+        channel_id: UCXbKJML9pVclFHLFzpvBgWw
+        status: active   # 251K subs
+      - name: Markets by Zerodha Hindi
+        type: youtube
+        url: https://www.youtube.com/@marketsbyzerodhahindi
+        about: One big story from the markets or the economy, every day, in Hindi.
+        channel_id: UCorKX0CAjQh0SnflWPnnI9w
+        status: active   # 210K subs
+      - name: Markets by Zerodha Kannada
+        type: youtube
+        url: https://www.youtube.com/@marketsbyzerodhakannada
+        about: Business and finance news in Kannada.
+        channel_id: UCdfeEGP3gM_7ZL5wbkDZKdg
+        status: dormant  # last upload ~1 year ago
+      - name: "@zerodhamarkets"
+        type: x
+        url: https://x.com/zerodhamarkets
+        about: Markets by Zerodha on X.
+        status: active
+
+  - id: subtext
+    name: Subtext
+    blurb: Long-form explorations of the lesser-known corners of finance and economics.
+    about: >-
+      Subtext looks at why things in finance and the economy are happening, rather than reacting to
+      what just happened. It publishes long-form explainers as a newsletter and as videos, with the
+      aim of making finance, economics and markets less boring.
+    properties:
+      - name: Subtext by Zerodha
+        type: newsletter
+        url: https://subtextbyzerodha.substack.com
+        about: Long-form writing that makes finance, economics and markets less boring.
+        feed: https://subtextbyzerodha.substack.com/feed
+        status: active   # latest 11 Oct 2026
+      - name: Zerodha Subtext
+        type: youtube
+        url: https://www.youtube.com/@SubtextbyZerodha
+        about: Video explainers on why things in finance are happening.
+        channel_id: UC-yQGXgvEnjg0bCBMtrYxPg
+        status: active
+
+  - id: in-the-money
+    name: In The Money
+    blurb: Trading and active investing, explored with nuance.
+    about: >-
+      In The Money explores trading and active investing with nuance, data and depth, through shows
+      such as The Long & The Short.
+    properties:
+      - name: In The Money by Zerodha
+        type: youtube
+        url: https://www.youtube.com/@InTheMoneybyZerodha
+        about: Trading and active investing, with data and depth.
+        channel_id: UCraobmW5aEASA18BT9Iz-fA
+        status: active   # 93K subs
+
+  - id: varsity
+    name: Zerodha Varsity
+    short: Varsity        # label in the colour key
+    blurb: Free, in-depth lessons on markets and personal finance.
+    about: >-
+      Zerodha Varsity is an extensive, openly accessible collection of stock market and personal
+      finance lessons, created by Karthik Rangappa at Zerodha. Alongside the modules on its website,
+      Varsity publishes videos in English and Hindi and the Mind Over Markets newsletter, home to
+      Delta, Second Order, Tell Me Why and Side Notes.
+    properties:
+      - name: Mind Over Markets
+        type: newsletter
+        url: https://zerodhavarsity.substack.com
+        about: Finance topics, made insightful in unconventional and fun ways.
+        feed: https://zerodhavarsity.substack.com/feed
+        status: active   # latest 14 Oct 2026
+        sections:
+          - { name: "Delta", slug: delta }
+          - { name: "Second Order", slug: second-order }
+          - { name: "Tell Me Why", slug: tell-me-why }
+          - { name: "Side Notes", slug: side-notes }
+      - name: Zerodha Varsity
+        type: youtube
+        url: https://www.youtube.com/@varsitybyzerodha
+        about: Lessons on markets, trading and personal finance.
+        channel_id: UCQXwgooTlP6tk2a-u6vgyUA
+        status: active   # 780K subs
+      - name: Zerodha Varsity Hindi
+        type: youtube
+        url: https://www.youtube.com/@ZerodhaVarsityHindi
+        about: Varsity's lessons, in Hindi.
+        channel_id: UCz0WDREXSJKVbYZ005q99iw
+        status: active
+      - name: Varsity (website)
+        type: web
+        url: https://zerodha.com/varsity/
+        about: The full Varsity modules, free to read.
+        status: active
+
+  - id: zero1
+    name: Zero1
+    blurb: Making money and wealth part of pop culture.
+    about: >-
+      Zero1 is a financial media network that Zerodha is building with LearnApp, with the aim of
+      making money and wealth part of pop culture. It publishes on YouTube in English and Hindi.
+    properties:
+      - name: Zero1 by Zerodha
+        type: youtube
+        url: https://www.youtube.com/@Zero1byZerodha
+        about: Money and wealth, made part of pop culture.
+        channel_id: UCUUlw3anBIkbW9W44Y-eURw
+        status: active   # 852K subs, upload 5 days ago
+      - name: Zero1 Hindi
+        type: youtube
+        url: https://www.youtube.com/@Zero1Hindi
+        about: Conversations about money, in Hindi.
+        channel_id: UCs2y3vIjRJG46v16kgVv_bQ
+        status: active
+      - name: Zero1 Hustle
+        type: youtube
+        url: https://www.youtube.com/@Zero1hustle
+        about: Stories of artists, entrepreneurs and leaders building careers and businesses.
+        channel_id: UCrgxgGQJWp_a2iWGaSJLzRA
+        status: dormant  # last upload ~10 months ago
+
+  - id: rainmatter
+    name: Rainmatter Foundation
+    short: Rainmatter        # label in the colour key
+    blurb: Climate action, a healthier environment and livelihoods.
+    about: >-
+      Rainmatter Foundation is a non-profit, set up by Zerodha, that supports organisations and
+      projects working on climate action, a healthier environment and livelihoods. Its weekly
+      Climate Brief, published as a newsletter and a YouTube show, explains one climate story at a
+      time in simple language.
+    properties:
+      - name: The Climate Brief
+        type: youtube
+        url: https://www.youtube.com/@TheClimateBriefbyRainmatter
+        about: One climate story a week, explained without jargon.
+        channel_id: UCkbq7D4kAqQYCTQ24Uzi8zg
+        status: active   # 42.5K subs
+      - name: Climate Brief by Rainmatter
+        type: newsletter
+        url: https://climatebriefbyrainmatter.substack.com
+        about: The Climate Brief, as a newsletter.
+        feed: https://climatebriefbyrainmatter.substack.com/feed
+        status: active   # latest 12 Oct 2026
+      - name: Rainmatter Foundation by Zerodha
+        type: youtube  # channel ID verified 2026-10-15 via feed title
+        url: https://www.youtube.com/@RainmatterFoundation
+        about: Conversations and stories from Rainmatter Foundation's work.
+        channel_id: UCg1Hf_toY4QaMUOo4Vvt_Ug
+        status: dormant  # last upload ~1 year ago
+
+  - id: zerodha
+    name: Zerodha
+    blurb: Product updates, announcements and the long-running Z-Connect blog.
+    about: >-
+      Zerodha's own channels: product updates, tutorials and company announcements on YouTube, and
+      Z-Connect, the company blog, which carries monthly updates and posts from Varsity and
+      Rainmatter.
+    properties:
+      - name: Zerodha
+        type: youtube
+        url: https://www.youtube.com/@zerodhaonline
+        about: Product updates, tutorials and company announcements.
+        channel_id: UC59YUBhNLMkS2Q8NBWBGHAA
+        status: active   # 769K subs
+      - name: Z-Connect
+        type: blog
+        url: https://zerodha.com/z-connect/
+        about: Zerodha's blog, with monthly updates and posts from across the company.
+        feed: https://zerodha.com/z-connect/feed   # WordPress; verified 2026-10-15
+        status: active

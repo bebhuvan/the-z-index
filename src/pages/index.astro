@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import Stream from '../components/Stream.astro';
+import WeekTape from '../components/WeekTape.astro';
+import Legend from '../components/Legend.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { items, displayItems, initiatives, url, abs, itemListLd, initiativeLd } from '../lib/data.js';
+
+// The homepage carries the last three weeks; the archive carries everything.
+const cutoff = Date.now() - 21 * 86400e3;
+const recent = items.filter((i) => Date.parse(i.date) >= cutoff);
+const recentDisplay = displayItems.filter((i) => Date.parse(i.date) >= cutoff);
+const site = Astro.site;
+
+const weekCount = items.filter((i) => !i.short && Date.parse(i.date) >= Date.parse(items[0].date) - 7 * 86400e3).length;
+
+const jsonld = {
+  '@type': 'CollectionPage',
+  name: 'Latest from Zerodha',
+  url: abs(site, ''),
+  mainEntity: itemListLd(recent.filter((i) => !i.short).slice(0, 30)),
+  hasPart: initiatives.map((ini) => initiativeLd(ini, site)),
+};
+---
+<Base jsonld={jsonld}>
+  <div class="wrap with-side">
+    <main id="main">
+      <header class="head">
+        <h1>Everything Zerodha publishes, newest first</h1>
+        <p class="dek">
+          An unofficial index of the newsletters, videos and blog posts from The Daily Brief, Varsity,
+          Subtext, In The Money, Zero1, The Climate Brief and the rest. Updated at 8 am and 9 pm IST.
+        </p>
+      </header>
+
+      <section class="section" aria-labelledby="tape-h">
+        <div class="section-head">
+          <h2 id="tape-h">The last seven days</h2>
+          <span class="muted">{weekCount} pieces, by time of day</span>
+        </div>
+        <WeekTape items={items} />
+        <Legend items={recent} />
+      </section>
+
+      <div id="latest">
+        <Stream items={recentDisplay} chips={false} />
+        {items.length > recent.length && (
+          <p class="more"><a class="link" href={url('archive/')}>Browse the full archive of {items.length.toLocaleString('en-IN')} pieces</a></p>
+        )}
+      </div>
+    </main>
+    <Sidebar />
+  </div>
+</Base>

@@ -1,0 +1,124 @@
+---
+// A filterable, date-grouped list of posts and videos. The initiative legend doubles as the filter.
+import Legend from './Legend.astro';
+import FormatIcon from './FormatIcon.astro';
+import { groupBy, dayKey, dayLabel, monthLabel, timeLabel, duration } from '../lib/data.js';
+
+const { items, by = 'day', chips = true, compact = false } = Astro.props;
+const groups = by === 'month'
+  ? groupBy(items, (d) => d.slice(0, 7), monthLabel)
+  : groupBy(items, dayKey, dayLabel);
+
+const FORMAT = { read: 'Read', video: 'Watch', audio: 'Listen' };
+const formats = Object.keys(FORMAT).filter((f) => items.some((i) => (i.formats ?? [i.format]).includes(f)));
+const hasShorts = items.some((i) => i.short);
+const dot = (id) => `--dot: var(--c-${id})`;
+// The default view (no filters, Shorts hidden) is rendered here, so the page needs no JS until
+// someone filters. Counts below are for that default view.
+const visible = (g) => g.items.filter((i) => !i.short);
+const plural = (n) => (n === 1 ? '1 piece' : `${n} pieces`);
+const shownDefault = items.filter((i) => !i.short).length;
+const MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
+const dateShort = (iso) => {
+  const [, m, d] = new Date(iso).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }).split('-');
+  return `${+d} ${MON[m - 1]}`;
+};
+---
+<div class="filters" id="filters">
+  {chips && <Legend items={items} />}
+  <div class="filter-row">
+    {formats.length > 1 && (
+      <div class="formats" role="group" aria-label="Show one format">
+        <button class="tab" type="button" data-fmt="" aria-pressed="true">All</button>
+        {formats.map((f) => <button class="tab" type="button" data-fmt={f} aria-pressed="false">{FORMAT[f]}</button>)}
+      </div>
+    )}
+    {hasShorts && <label class="toggle"><input type="checkbox" id="shorts" /> Include Shorts</label>}
+    <span class="count" id="count" aria-live="polite">{plural(shownDefault)}</span>
+  </div>
+</div>
+
+<div id="stream" class={compact ? 'compact' : null}>
+  {groups.map((g) => (
+    <section class="day" data-group hidden={visible(g).length === 0 ? true : null}>
+      <div class="day-head">
+        <h3>{g.label}</h3>
+        <span class="n" data-n>{plural(visible(g).length)}</span>
+      </div>
+      {g.items.map((it) => (
+        <article class="item" data-ini={it.initiative} data-fmt={(it.formats ?? [it.format]).join(' ')} data-short={it.short ? '1' : null} hidden={it.short ? true : null}>
+          <div class="when">
+            <time class="time" datetime={it.date}>{by === 'month' ? dateShort(it.date) : timeLabel(it.date)}</time>
+            <span class="formats-ic">{(it.formats ?? [it.format]).map((f) => <FormatIcon format={f} />)}</span>
+          </div>
+          <div>
+            <h4><a href={it.url} target="_blank" rel="noopener">{it.title}</a></h4>
+            {!compact && it.summary && <p class="sum">{it.summary}</p>}
+            <div class="meta" style={dot(it.initiative)}>
+              <span class="src"><span class="swatch" aria-hidden="true"></span>{it.source}</span>
+              {it.section && <span>{it.section}</span>}
+              {it.duration ? <span>{duration(it.duration)}</span> : null}
+              {it.paid && <span>For paid subscribers</span>}
+              {it.also?.map((a) => <a class="also" href={a.url} target="_blank" rel="noopener">{a.label}</a>)}
+            </div>
+          </div>
+        </article>
+      ))}
+    </section>
+  ))}
+  <p class="empty" id="empty" hidden={shownDefault > 0 ? true : null}>No pieces match these filters. Choose Everything or All to see the full list.</p>
+</div>
+
+<script is:inline>
+(() => {
+  // Filter buttons can live anywhere on the page (the homepage puts the key under the chart).
+  const root = document;
+  const legend = document.querySelector('.legend');
+  const shorts = document.getElementById('shorts');
+  const params = new URLSearchParams(location.search);
+  const state = { ini: params.get('i') || '', fmt: params.get('f') || '', shorts: params.get('shorts') === '1' };
+  let groups;
+
+  function apply() {
+    // Collected lazily: nothing runs on a default page load.
+    groups ??= [...document.querySelectorAll('#stream [data-group]')].map((g) => ({
+      el: g, n: g.querySelector('[data-n]'), items: [...g.querySelectorAll('.item')],
+    }));
+    root.querySelectorAll('[data-ini]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ini === state.ini)));
+    root.querySelectorAll('[data-fmt]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fmt === state.fmt)));
+    legend?.classList.toggle('has-active', !!state.ini);
+    if (shorts) shorts.checked = state.shorts;
+    let shown = 0;
+    for (const g of groups) {
+      let n = 0;
+      for (const el of g.items) {
+        const ok = (!state.ini || el.dataset.ini === state.ini)
+          && (!state.fmt || el.dataset.fmt.split(' ').includes(state.fmt))
+          && (state.shorts || !el.dataset.short);
+        if (el.hidden === ok) el.hidden = !ok;
+        if (ok) n++;
+      }
+      g.el.hidden = n === 0;
+      g.n.textContent = n === 1 ? '1 piece' : `${n} pieces`;
+      shown += n;
+    }
+    document.getElementById('count').textContent = shown === 1 ? '1 piece' : `${shown.toLocaleString('en-IN')} pieces`;
+    document.getElementById('empty').hidden = shown > 0;
+    const q = new URLSearchParams();
+    if (state.ini) q.set('i', state.ini);
+    if (state.fmt) q.set('f', state.fmt);
+    if (state.shorts) q.set('shorts', '1');
+    history.replaceState(null, '', (q.size ? `?${q}` : location.pathname) + location.hash);
+  }
+
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-ini], button[data-fmt]');
+    if (!b) return;
+    if ('ini' in b.dataset) state.ini = b.dataset.ini;
+    if ('fmt' in b.dataset) state.fmt = b.dataset.fmt;
+    apply();
+  });
+  shorts?.addEventListener('change', () => { state.shorts = shorts.checked; apply(); });
+  if (state.ini || state.fmt || state.shorts) apply();
+})();
+</script>

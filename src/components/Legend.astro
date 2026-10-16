@@ -1,0 +1,16 @@
+---
+// Initiative colour key. Each entry is also a filter for the stream on the page.
+import { activeInitiatives } from '../lib/data.js';
+const { items } = Astro.props;
+const list = activeInitiatives.filter((ini) => items.some((i) => i.initiative === ini.id));
+---
+{list.length > 1 && (
+  <div class="legend" role="group" aria-label="Show one publication">
+    <button class="tab" type="button" data-ini="" aria-pressed="true">Everything</button>
+    {list.map((ini) => (
+      <button class="tab" type="button" data-ini={ini.id} aria-pressed="false" style={`--dot: var(--c-${ini.id})`} title={ini.name}>
+        <span class="swatch" aria-hidden="true"></span>{ini.short ?? ini.name}
+      </button>
+    ))}
+  </div>
+)}
