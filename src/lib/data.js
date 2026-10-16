@@ -2,7 +2,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { parse } from 'yaml';
 import { pathToFileURL } from 'node:url';
-import { cleanTitles, mergeStories } from './display.js';
+import { cleanTitles, mergeStories, safeItems } from './display.js';
 
 // Bundling relocates this module, so resolve from the project root (cwd) rather than import.meta.url.
 const root = pathToFileURL(process.cwd() + '/');
@@ -12,7 +12,7 @@ export const sources = parse(read('sources.yaml'));
 export const initiatives = sources.initiatives;
 export const initiativeById = Object.fromEntries(initiatives.map((i) => [i.id, i]));
 
-export const items = dropBoilerplate(JSON.parse(read('data/items.json')));
+export const items = dropBoilerplate(safeItems(JSON.parse(read('data/items.json'))));
 
 // Some publications open every post with the same intro ("Welcome to Aftermarket Report, ...").
 // A summary that repeats across several posts of one source says nothing, so blank it.

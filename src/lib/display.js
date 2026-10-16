@@ -5,6 +5,13 @@
 //  2. A newsletter post and the video of the same story (same initiative, within 20 hours,
 //     similar headline) become one entry with both links, so a story isn't listed twice.
 
+// Links and images come from third-party feeds and end up in href/src attributes and in the
+// search index. Escaping doesn't stop a `javascript:` URL, so anything not http(s) is dropped.
+const isWeb = (u) => { try { return ['http:', 'https:'].includes(new URL(u).protocol); } catch { return false; } };
+export const safeItems = (list) => list
+  .filter((it) => isWeb(it.url))
+  .map((it) => (it.image && !isWeb(it.image) ? { ...it, image: null } : it));
+
 const normSeg = (s) => s.toLowerCase().replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
 const isDateSeg = (s) => /^\s*\d{1,2}(st|nd|rd|th)?\s+[a-z]+\s+\d{4}\b/i.test(s);
 const seriesName = (s) => s.replace(/\s*(#\s*\d+|ep(isode)?\.?\s*\d+|part\s*\d+)\s*$/i, '').trim();

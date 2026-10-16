@@ -7,11 +7,11 @@ import * as pagefind from 'pagefind';
 import { parse } from 'yaml';
 import { fileURLToPath } from 'node:url';
 import { loadText } from './textstore.mjs';
-import { cleanTitles } from '../src/lib/display.js';
+import { cleanTitles, safeItems } from '../src/lib/display.js';
 
 const root = new URL('../', import.meta.url);
 // Clean titles for display; the original title stays in the indexed text so it still matches.
-const raw = JSON.parse(await readFile(new URL('data/items.json', root), 'utf8'));
+const raw = safeItems(JSON.parse(await readFile(new URL('data/items.json', root), 'utf8')));
 const items = cleanTitles(raw);
 const rawTitle = new Map(raw.map((i) => [i.id, i.title]));
 const { initiatives } = parse(await readFile(new URL('sources.yaml', root), 'utf8'));
