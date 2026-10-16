@@ -1,33 +1,33 @@
 {
- "generated": "2026-10-16T05:29:19.530Z",
+ "generated": "2026-10-16T05:34:21.568Z",
  "sources": [
   {
    "name": "The Daily Brief",
    "ok": true,
    "fetched": 20,
-   "added": 1,
-   "ms": 1179
+   "added": 0,
+   "ms": 990
   },
   {
    "name": "The Chatter",
    "ok": true,
    "fetched": 20,
    "added": 0,
-   "ms": 284
+   "ms": 579
   },
   {
    "name": "Aftermarket Report",
    "ok": true,
    "fetched": 20,
-   "added": 1,
-   "ms": 673
+   "added": 0,
+   "ms": 172
   },
   {
    "name": "What the hell is happening?",
    "ok": true,
    "fetched": 9,
    "added": 0,
-   "ms": 269
+   "ms": 225
   },
   {
    "name": "Markets by Zerodha",
@@ -49,7 +49,7 @@
    "ok": true,
    "fetched": 20,
    "added": 0,
-   "ms": 287
+   "ms": 219
   },
   {
    "name": "Zerodha Subtext",
@@ -66,14 +66,12 @@
    "ok": true,
    "fetched": 20,
    "added": 0,
-   "ms": 184
+   "ms": 653
   },
   {
    "name": "Zerodha Varsity",
-   "ok": true,
-   "fetched": 15,
-   "added": 0,
-   "ms": 170
+   "ok": false,
+   "error": "HTTP 404 for https://www.youtube.com/feeds/videos.xml?channel_id=UCQXwgooTlP6tk2a-u6vgyUA (via proxy)"
   },
   {
    "name": "Zerodha Varsity Hindi",
@@ -82,8 +80,10 @@
   },
   {
    "name": "Zero1 by Zerodha",
-   "ok": false,
-   "error": "HTTP 404 for https://www.youtube.com/feeds/videos.xml?channel_id=UCUUlw3anBIkbW9W44Y-eURw (via proxy)"
+   "ok": true,
+   "fetched": 15,
+   "added": 0,
+   "ms": 268
   },
   {
    "name": "Zero1 Hindi",
@@ -105,7 +105,7 @@
    "ok": true,
    "fetched": 10,
    "added": 0,
-   "ms": 233
+   "ms": 230
   },
   {
    "name": "Rainmatter Foundation by Zerodha",
@@ -114,17 +114,15 @@
   },
   {
    "name": "Zerodha",
-   "ok": true,
-   "fetched": 15,
-   "added": 1,
-   "ms": 167
+   "ok": false,
+   "error": "HTTP 404 for https://www.youtube.com/feeds/videos.xml?channel_id=UC59YUBhNLMkS2Q8NBWBGHAA (via proxy)"
   },
   {
    "name": "Z-Connect",
    "ok": true,
    "fetched": 50,
    "added": 0,
-   "ms": 685
+   "ms": 535
   }
  ]
 }
