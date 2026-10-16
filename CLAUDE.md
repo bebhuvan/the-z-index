@@ -62,5 +62,8 @@ All values are tokens in `:root` of `src/styles/global.css`. Don't add a size, s
 
 ## Status
 - Full-text backfill completed on 2026-10-15 (1,676 posts, 0 failures). Search has full text for 1,878 of 1,921 pieces; the other 43 are videos with empty YouTube descriptions, and their titles are still indexed. `data/text/` is about 29 MB in 35 monthly files, with the current month at about 0.8 MB. The Pagefind output is about 30 MB, but each search downloads only small fragments.
-- Not yet pushed to GitHub. Waiting on the repo owner/name decision and the `FEED_PROXY` variable.
+- Live since 2026-10-16 at https://bebhuvan.github.io/the-z-index/ (repo: github.com/bebhuvan/the-z-index, public, because free GitHub Pages needs that). Pages builds from Actions. `FEED_PROXY` is set to the open Pages proxy; no `PROXY_KEY` or `YT_API_KEY` yet.
+- CI commits "Update feed archive" to main, so run `git pull --rebase` before pushing.
+- `docs/design-brief.md` is gitignored: it's an internal note that names the owner and their employer, which doesn't belong in a public repo for an unofficial site.
+- Feed URLs that aren't http(s) are dropped (`safeItems` in `display.js`), and the JSON-LD escapes `<`. Keep both, because feed content is untrusted.
 - Social accounts: only X @zerodhamarkets is listed so far.
